@@ -15,6 +15,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICandidateService, CandidateService>();
+builder.Services.AddScoped<ICompanyService, CompanyService>();
 
 builder.Services.AddControllers();
 
