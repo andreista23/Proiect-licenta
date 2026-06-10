@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RecruitmentPlatform.Application.DTOs.Auth;
 using RecruitmentPlatform.Application.Interfaces;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RecruitmentPlatform.Api.Controllers;
 
@@ -38,6 +40,34 @@ public class AuthController : ControllerBase
         try
         {
             var response = await _authService.LoginAsync(request);
+            return Ok(response);
+        }
+        catch (UnauthorizedAccessException exception)
+        {
+            return Unauthorized(new
+            {
+                message = exception.Message
+            });
+        }
+    }
+
+    [Authorize]
+    [HttpGet("me")]
+    public async Task<IActionResult> Me()
+    {
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (!Guid.TryParse(userIdClaim, out var userId))
+        {
+            return Unauthorized(new
+            {
+                message = "Invalid token."
+            });
+        }
+
+        try
+        {
+            var response = await _authService.GetCurrentUserAsync(userId);
             return Ok(response);
         }
         catch (UnauthorizedAccessException exception)

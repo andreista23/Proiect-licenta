@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using RecruitmentPlatform.Application.Interfaces;
 using RecruitmentPlatform.Infrastructure.Data;
 using RecruitmentPlatform.Infrastructure.Services;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,11 +14,44 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ICandidateService, CandidateService>();
 
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "RecruitmentPlatform API",
+        Version = "v1"
+    });
+
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter JWT token"
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 
 var jwtKey = builder.Configuration["Jwt:Key"];
 

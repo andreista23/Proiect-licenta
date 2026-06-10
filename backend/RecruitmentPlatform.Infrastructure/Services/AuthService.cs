@@ -125,4 +125,22 @@ public class AuthService : IAuthService
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
+
+    public async Task<AuthResponseDto> GetCurrentUserAsync(Guid userId)
+    {
+        var user = await _dbContext.Users
+            .FirstOrDefaultAsync(user => user.Id == userId);
+
+        if (user is null)
+        {
+            throw new UnauthorizedAccessException("User not found.");
+        }
+
+        if (!user.IsActive)
+        {
+            throw new UnauthorizedAccessException("This account is inactive.");
+        }
+
+        return CreateAuthResponse(user);
+    }
 }
