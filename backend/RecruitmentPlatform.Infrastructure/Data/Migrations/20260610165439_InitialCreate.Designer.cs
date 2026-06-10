@@ -12,7 +12,7 @@ using RecruitmentPlatform.Infrastructure.Data;
 namespace RecruitmentPlatform.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260610162950_InitialCreate")]
+    [Migration("20260610165439_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -331,13 +331,13 @@ namespace RecruitmentPlatform.Infrastructure.Data.Migrations
                     b.HasOne("RecruitmentPlatform.Domain.Entities.CandidateProfile", "Candidate")
                         .WithMany("SavedJobs")
                         .HasForeignKey("CandidateId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("RecruitmentPlatform.Domain.Entities.JobPost", "JobPost")
                         .WithMany("SavedJobs")
                         .HasForeignKey("JobPostId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Candidate");

@@ -182,13 +182,13 @@ namespace RecruitmentPlatform.Infrastructure.Data.Migrations
                         column: x => x.CandidateId,
                         principalTable: "CandidateProfiles",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_SavedJobs_JobPosts_JobPostId",
                         column: x => x.JobPostId,
                         principalTable: "JobPosts",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(

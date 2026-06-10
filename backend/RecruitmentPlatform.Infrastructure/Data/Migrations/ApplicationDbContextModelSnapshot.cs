@@ -328,13 +328,13 @@ namespace RecruitmentPlatform.Infrastructure.Data.Migrations
                     b.HasOne("RecruitmentPlatform.Domain.Entities.CandidateProfile", "Candidate")
                         .WithMany("SavedJobs")
                         .HasForeignKey("CandidateId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("RecruitmentPlatform.Domain.Entities.JobPost", "JobPost")
                         .WithMany("SavedJobs")
                         .HasForeignKey("JobPostId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Candidate");

@@ -81,12 +81,14 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<SavedJob>()
             .HasOne(savedJob => savedJob.Candidate)
             .WithMany(candidate => candidate.SavedJobs)
-            .HasForeignKey(savedJob => savedJob.CandidateId);
+            .HasForeignKey(savedJob => savedJob.CandidateId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<SavedJob>()
             .HasOne(savedJob => savedJob.JobPost)
             .WithMany(jobPost => jobPost.SavedJobs)
-            .HasForeignKey(savedJob => savedJob.JobPostId);
+            .HasForeignKey(savedJob => savedJob.JobPostId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 
     private static void ConfigureJobApplication(ModelBuilder modelBuilder)
