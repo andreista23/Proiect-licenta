@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RecruitmentPlatform.Application.DTOs.Jobs;
 using RecruitmentPlatform.Application.Interfaces;
+using RecruitmentPlatform.Application.DTOs.Applications;
 
 namespace RecruitmentPlatform.Api.Controllers;
 
@@ -11,10 +12,12 @@ namespace RecruitmentPlatform.Api.Controllers;
 public class JobsController : ControllerBase
 {
     private readonly IJobService _jobService;
+    private readonly IApplicationService _applicationService;
 
-    public JobsController(IJobService jobService)
+    public JobsController(IJobService jobService, IApplicationService applicationService)
     {
         _jobService = jobService;
+        _applicationService = applicationService;
     }
 
     [HttpGet]
@@ -136,6 +139,48 @@ public class JobsController : ControllerBase
         {
             await _jobService.DeleteAsync(userId.Value, id);
             return NoContent();
+        }
+        catch (UnauthorizedAccessException exception)
+        {
+            return Unauthorized(new
+            {
+                message = exception.Message
+            });
+        }
+        catch (InvalidOperationException exception)
+        {
+            return BadRequest(new
+            {
+                message = exception.Message
+            });
+        }
+        catch (KeyNotFoundException exception)
+        {
+            return NotFound(new
+            {
+                message = exception.Message
+            });
+        }
+    }
+
+    [Authorize]
+    [HttpPost("{id:guid}/apply")]
+    public async Task<IActionResult> Apply(Guid id, CreateJobApplicationDto request)
+    {
+        var userId = GetCurrentUserId();
+
+        if (userId is null)
+        {
+            return Unauthorized(new
+            {
+                message = "Invalid token."
+            });
+        }
+
+        try
+        {
+            var application = await _applicationService.ApplyAsync(userId.Value, id, request);
+            return Ok(application);
         }
         catch (UnauthorizedAccessException exception)
         {
