@@ -27,6 +27,34 @@ public class JobsController : ControllerBase
         return Ok(jobs);
     }
 
+    [Authorize(Roles = "Recruiter")]
+    [HttpGet("my")]
+    public async Task<ActionResult<List<JobPostDto>>> GetMyJobs()
+    {
+        var userId = GetCurrentUserId();
+
+        if (userId is null)
+        {
+            return Unauthorized(new
+            {
+                message = "Invalid token."
+            });
+        }
+
+        try
+        {
+            var jobs = await _jobService.GetMyJobsAsync(userId.Value);
+            return Ok(jobs);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new
+            {
+                message = ex.Message
+            });
+        }
+    }
+
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {

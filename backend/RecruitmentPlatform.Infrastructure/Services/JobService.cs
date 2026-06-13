@@ -222,6 +222,42 @@ public class JobService : IJobService
         await _dbContext.SaveChangesAsync();
     }
 
+    public async Task<List<JobPostDto>> GetMyJobsAsync(Guid userId)
+    {
+        var companyProfile = await _dbContext.CompanyProfiles
+            .FirstOrDefaultAsync(c => c.UserId == userId);
+
+        if (companyProfile == null)
+        {
+            throw new Exception("Profilul companiei nu există.");
+        }
+
+        var jobs = await _dbContext.JobPosts
+            .Include(j => j.Company)
+            .Where(j => j.CompanyId == companyProfile.Id)
+            .OrderByDescending(j => j.CreatedAt)
+            .Select(j => new JobPostDto
+            {
+                Id = j.Id,
+                CompanyId = j.CompanyId,
+                CompanyName = j.Company.CompanyName,
+                Title = j.Title,
+                Description = j.Description,
+                Requirements = j.Requirements,
+                Location = j.Location,
+                JobType = j.JobType,
+                WorkMode = j.WorkMode,
+                ExperienceLevel = j.ExperienceLevel,
+                SalaryMin = j.SalaryMin,
+                SalaryMax = j.SalaryMax,
+                IsActive = j.IsActive,
+                CreatedAt = j.CreatedAt
+            })
+            .ToListAsync();
+
+        return jobs;
+    }
+
     private static string NormalizeText(string? text)
     {
         if (string.IsNullOrWhiteSpace(text))
